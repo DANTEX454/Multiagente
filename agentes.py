@@ -5,7 +5,22 @@ import anthropic
 from calculos import HERRAMIENTAS
 
 MODELO = os.getenv("MODELO", "claude-sonnet-5-5")
-cliente = anthropic.Anthropic()  # lee ANTHROPIC_API_KEY del entorno
+
+
+def _obtener_clave():
+    """Busca la clave en variables de entorno y, si no, en los Secrets de Streamlit."""
+    clave = os.getenv("ANTHROPIC_API_KEY")
+    if clave:
+        return clave
+    try:
+        import streamlit as st
+        return st.secrets["ANTHROPIC_API_KEY"]
+    except Exception:
+        return None
+
+
+CLAVE = _obtener_clave()
+cliente = anthropic.Anthropic(api_key=CLAVE)
 
 REGLAS = (
     "Responde en español, claro y profesional. Los cálculos los haces SIEMPRE con las herramientas "
